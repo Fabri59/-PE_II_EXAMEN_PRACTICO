@@ -1,9 +1,12 @@
 # Examen Práctica Unidad II - PETI
 
+ESTUDIANTE: Diego Fabrizio Andia Navarro
+
 **Proyecto:** Sistema de Gestión de Plan Estratégico de TI  
 **Tecnología base:** ASP.NET Core MVC (.NET 8)  
 **Fecha del informe:** 27 de mayo de 2026  
 **Estado general:** Base funcional con ampliación PETI operativa
+
 
 ---
 
