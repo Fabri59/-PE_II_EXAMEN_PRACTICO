@@ -1,0 +1,224 @@
+@model Proyecto_Red.ViewModels.PetiSeguimientoViewModel
+
+@{
+    ViewData["Title"] = "Seguimiento PETI";
+}
+
+<div class="d-flex justify-content-between align-items-center flex-wrap gap-3 mb-4">
+    <div>
+        <h1 class="display-6 fw-bold">Seguimiento PETI</h1>
+        <p class="text-muted mb-0">Centraliza los indicadores KPI y los planes de acción para dar seguimiento real al avance estratégico.</p>
+    </div>
+    <div class="text-end">
+        <span class="badge bg-primary me-2">@Model.TotalIndicadores KPI</span>
+        <span class="badge bg-success">@Model.TotalPlanesAccion planes</span>
+    </div>
+</div>
+
+@if (TempData["PetiSuccess"] is string successMessage)
+{
+    <div class="alert alert-success alert-dismissible fade show" role="alert">
+        @successMessage
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Cerrar"></button>
+    </div>
+}
+
+<div class="row g-4 mb-4">
+    <div class="col-md-4">
+        <div class="card border-0 h-100" style="background: linear-gradient(135deg, #1d3557 0%, #457b9d 100%); color: white;">
+            <div class="card-body">
+                <p class="mb-2 opacity-75"><i class="fas fa-bullseye"></i> KPI registrados</p>
+                <h2 class="display-6 fw-bold mb-0">@Model.TotalIndicadores</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 h-100" style="background: linear-gradient(135deg, #2a9d8f 0%, #8ab17d 100%); color: white;">
+            <div class="card-body">
+                <p class="mb-2 opacity-75"><i class="fas fa-tasks"></i> Planes de acción</p>
+                <h2 class="display-6 fw-bold mb-0">@Model.TotalPlanesAccion</h2>
+            </div>
+        </div>
+    </div>
+    <div class="col-md-4">
+        <div class="card border-0 h-100" style="background: linear-gradient(135deg, #e76f51 0%, #f4a261 100%); color: white;">
+            <div class="card-body">
+                <p class="mb-2 opacity-75"><i class="fas fa-percentage"></i> Cumplimiento promedio</p>
+                <h2 class="display-6 fw-bold mb-0">@Model.CumplimientoPromedio%</h2>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="row g-4">
+    <div class="col-lg-5">
+        <div class="card shadow-sm h-100">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0"><i class="fas fa-plus-circle text-primary"></i> Nuevo KPI</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CrearIndicador" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <div class="col-12">
+                        <label asp-for="NuevoIndicador.Nombre" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.Nombre" class="form-control" />
+                        <span asp-validation-for="NuevoIndicador.Nombre" class="text-danger"></span>
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="NuevoIndicador.Descripcion" class="form-label"></label>
+                        <textarea asp-for="NuevoIndicador.Descripcion" class="form-control" rows="3"></textarea>
+                        <span asp-validation-for="NuevoIndicador.Descripcion" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevoIndicador.Formula" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.Formula" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevoIndicador.Meta" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.Meta" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevoIndicador.ResultadoActual" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.ResultadoActual" class="form-control" />
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="NuevoIndicador.PorcentajeCumplimiento" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.PorcentajeCumplimiento" type="number" min="0" max="100" class="form-control" />
+                        <span asp-validation-for="NuevoIndicador.PorcentajeCumplimiento" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-3">
+                        <label asp-for="NuevoIndicador.Semaforo" class="form-label"></label>
+                        <input asp-for="NuevoIndicador.Semaforo" class="form-control" placeholder="Auto" />
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-primary">
+                            <i class="fas fa-save me-2"></i> Guardar KPI
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+
+    <div class="col-lg-7">
+        <div class="card shadow-sm mb-4">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0"><i class="fas fa-table text-primary"></i> Indicadores KPI</h5>
+            </div>
+            <div class="card-body table-responsive">
+                <table class="table table-hover align-middle mb-0" id="datatable">
+                    <thead>
+                        <tr>
+                            <th>Nombre</th>
+                            <th>Meta</th>
+                            <th>Resultado</th>
+                            <th>%</th>
+                            <th>Semáforo</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach (var indicador in Model.Indicadores)
+                        {
+                            <tr>
+                                <td>@indicador.Nombre</td>
+                                <td>@indicador.Meta</td>
+                                <td>@indicador.ResultadoActual</td>
+                                <td>@indicador.PorcentajeCumplimiento%</td>
+                                <td>
+                                    <span class="badge bg-@(indicador.Semaforo?.Equals("Verde", StringComparison.OrdinalIgnoreCase) == true ? "success" : indicador.Semaforo?.Equals("Amarillo", StringComparison.OrdinalIgnoreCase) == true ? "warning" : "danger")">
+                                        @indicador.Semaforo
+                                    </span>
+                                </td>
+                            </tr>
+                        }
+                    </tbody>
+                </table>
+            </div>
+        </div>
+
+        <div class="card shadow-sm">
+            <div class="card-header bg-white border-bottom">
+                <h5 class="mb-0"><i class="fas fa-clipboard-list text-success"></i> Nuevo plan de acción</h5>
+            </div>
+            <div class="card-body">
+                <form asp-action="CrearPlanAccion" method="post" class="row g-3">
+                    @Html.AntiForgeryToken()
+                    <div class="col-12">
+                        <label asp-for="NuevoPlanAccion.Actividad" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.Actividad" class="form-control" />
+                        <span asp-validation-for="NuevoPlanAccion.Actividad" class="text-danger"></span>
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevoPlanAccion.Responsable" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.Responsable" class="form-control" />
+                    </div>
+                    <div class="col-md-6">
+                        <label asp-for="NuevoPlanAccion.Estado" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.Estado" class="form-control" placeholder="Pendiente" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="NuevoPlanAccion.Presupuesto" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.Presupuesto" type="number" step="0.01" min="0" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="NuevoPlanAccion.FechaInicio" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.FechaInicio" type="date" class="form-control" />
+                    </div>
+                    <div class="col-md-4">
+                        <label asp-for="NuevoPlanAccion.FechaFin" class="form-label"></label>
+                        <input asp-for="NuevoPlanAccion.FechaFin" type="date" class="form-control" />
+                    </div>
+                    <div class="col-12">
+                        <label asp-for="NuevoPlanAccion.Observaciones" class="form-label"></label>
+                        <textarea asp-for="NuevoPlanAccion.Observaciones" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="col-12 text-end">
+                        <button type="submit" class="btn btn-success">
+                            <i class="fas fa-paper-plane me-2"></i> Guardar plan de acción
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="card shadow-sm mt-4">
+    <div class="card-header bg-white border-bottom">
+        <h5 class="mb-0"><i class="fas fa-list-check text-success"></i> Planes de acción registrados</h5>
+    </div>
+    <div class="card-body table-responsive">
+        <table class="table table-hover align-middle mb-0">
+            <thead>
+                <tr>
+                    <th>Actividad</th>
+                    <th>Responsable</th>
+                    <th>Presupuesto</th>
+                    <th>Fechas</th>
+                    <th>Estado</th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var plan in Model.PlanesAccion)
+                {
+                    <tr>
+                        <td>@plan.Actividad</td>
+                        <td>@plan.Responsable</td>
+                        <td>@(plan.Presupuesto.HasValue ? plan.Presupuesto.Value.ToString("C") : "Sin definir")</td>
+                        <td>
+                            @if (plan.FechaInicio.HasValue || plan.FechaFin.HasValue)
+                            {
+                                <span>@plan.FechaInicio?.ToString("dd/MM/yyyy") - @plan.FechaFin?.ToString("dd/MM/yyyy")</span>
+                            }
+                            else
+                            {
+                                <span>Sin fechas</span>
+                            }
+                        </td>
+                        <td><span class="badge bg-secondary">@plan.Estado</span></td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>
