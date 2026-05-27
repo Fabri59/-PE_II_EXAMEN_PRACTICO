@@ -1,4 +1,4 @@
-# Examen II UNIDAD - PETI
+# Examen Práctica Unidad II - PETI
 
 **Proyecto:** Sistema de Gestión de Plan Estratégico de TI  
 **Tecnología base:** ASP.NET Core MVC (.NET 8)  
