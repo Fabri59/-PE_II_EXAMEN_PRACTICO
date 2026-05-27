@@ -1,4 +1,4 @@
-# INFORME DE AVANCE DEL SISTEMA PETI
+# Examen II UNIDAD - PETI
 
 **Proyecto:** Sistema de Gestión de Plan Estratégico de TI  
 **Tecnología base:** ASP.NET Core MVC (.NET 8)  
